@@ -6,10 +6,10 @@ body {
 }
 
 textarea {
-    margin-top: 50px;
+    margin-top: 20px;
     width: 60%;
     height: 200px;
-    padding: 5px;
+    padding: 15px;
 }
 
 .keyboard {
@@ -43,13 +43,17 @@ textarea {
     align-items: center;
 }
 
-.keyboard__key:hover,
-.keyboard__key:active {
+.keyboard__key:hover {
     background: rgba(255,255,255,0.12);
+}
+
+.keyboard__key:active {
+    transform: translateY(2px)
 }
 
 .keyboard__key--pressed {
     background: rgba(46, 28, 222, 0.69);
+    transform: translateY(2px)
 }
 
 .keyboard__key--wide {

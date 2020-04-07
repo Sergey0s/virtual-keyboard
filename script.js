@@ -1,5 +1,11 @@
+const title = document.createElement('h1');
+const text = document.createElement('p');
+title.innerText = 'Виртуальная клавиатура';
+text.innerText = 'Переключения языка сочетанием клавиш Shift + Alt или нажатием на ⌨. Выполнено на OS Ubuntu.';
 const textarea = document.createElement('textarea');
 textarea.setAttribute('autofocus', 'true');
+document.body.append(title);
+document.body.append(text);
 document.body.append(textarea);
 
 const Keyboard = {
@@ -16,7 +22,7 @@ const Keyboard = {
 
   properties: {
     value: '',
-    language: 'ru',
+    language: localStorage.getItem('lang') || 'ru',
     capsLock: null,
   },
 
@@ -542,7 +548,6 @@ const Keyboard = {
       ];
     }
 
-
     keyLayout.forEach((element) => {
       const keyElement = document.createElement('button');
       const insertLineBreak = ['backspace', '\\', 'enter', '↑'].indexOf(element.key) !== -1;
@@ -634,10 +639,12 @@ const Keyboard = {
   },
 
   _changeLanguage() {
+    this.properties.capsLock = false;
     this.properties.language === 'ru' ? this.properties.language = 'en' : this.properties.language = 'ru';
     this.elements.keysContainer.innerHTML = '';
     this.elements.keysContainer.append(this._createKeys(this.properties.language));
     this.elements.keys = this.elements.keysContainer.querySelectorAll('.keyboard__key');
+    localStorage.setItem('lang', this.properties.language);
   },
 
   _toggleCapsLock() {
@@ -650,20 +657,33 @@ const Keyboard = {
 };
 
 
+function checkLanguageChange() {
+  const pressedButtons = document.querySelectorAll('.keyboard__key--pressed');
+  if (pressedButtons.length > 1) {
+    if ((+pressedButtons[0].dataset.keyCode === 16 && +pressedButtons[1].dataset.keyCode === 18)
+      || (+pressedButtons[1].dataset.keyCode === 16 && +pressedButtons[0].dataset.keyCode === 18)) {
+      Keyboard._changeLanguage();
+    }
+  }
+  if (pressedButtons.length === 1) {
+    if (+pressedButtons[0].dataset.keyCode === 20) {
+      Keyboard._toggleCapsLock();
+    }
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   Keyboard.init();
 });
 
 window.addEventListener('keydown', (e) => {
-  // console.log(+e.keyCode)
-  //   console.log(Keyboard);
-
   for (const key of Keyboard.elements.keys) {
     // console.log(+key.dataset.keyCode)
     if (+e.keyCode === +key.dataset.keyCode) {
       key.classList.add('keyboard__key--pressed');
     }
   }
+  checkLanguageChange();
 });
 
 window.addEventListener('keyup', (e) => {
