@@ -603,7 +603,7 @@ const Keyboard = {
         case 'space':
           keyElement.classList.add('keyboard__key--extra-wide');
           keyElement.addEventListener('click', () => {
-            this.properties.value += ' ';
+            this.properties.value = ' ';
             this._triggerEvent('oninput');
           });
           break;
