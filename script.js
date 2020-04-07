@@ -556,9 +556,8 @@ const Keyboard = {
         case 'backspace':
           keyElement.classList.add('keyboard__key--wide');
           keyElement.addEventListener('click', () => {
-            this.properties.value = this.properties.value.substring(0,
-              this.properties.value.length - 1);
-            this._triggerEvent('oninput');
+            textarea.value = textarea.value.substring(0,
+              textarea.value.length - 1);
           });
           break;
 
@@ -584,7 +583,7 @@ const Keyboard = {
         case 'tab':
           keyElement.classList.add('keyboard__key--wide');
           keyElement.addEventListener('click', () => {
-            this.properties.value += '  ';
+            this.properties.value = '  ';
             this._triggerEvent('oninput');
           });
           break;
@@ -613,25 +612,12 @@ const Keyboard = {
         default:
           keyElement.textContent.toLowerCase();
           keyElement.addEventListener('click', () => {
-            this.properties.value += this.properties.capsLock
+            this.properties.value = this.properties.capsLock
               ? element.key.toUpperCase() : element.key.toLowerCase();
             this._triggerEvent('oninput');
           });
           break;
       }
-
-      window.addEventListener('keydown', (e) => {
-        if (+e.keyCode === +element.code) {
-          keyElement.classList.add('keyboard__key--pressed');
-        }
-      });
-
-      window.addEventListener('keyup', (e) => {
-        if (+e.keyCode === +element.code) {
-          keyElement.classList.remove('keyboard__key--pressed');
-        }
-      });
-
 
       fragment.append(keyElement);
 
@@ -644,13 +630,14 @@ const Keyboard = {
   },
 
   _triggerEvent() {
-    textarea.innerHTML = this.properties.value;
+    textarea.value += this.properties.value;
   },
 
   _changeLanguage() {
     this.properties.language === 'ru' ? this.properties.language = 'en' : this.properties.language = 'ru';
     this.elements.keysContainer.innerHTML = '';
     this.elements.keysContainer.append(this._createKeys(this.properties.language));
+    this.elements.keys = this.elements.keysContainer.querySelectorAll('.keyboard__key');
   },
 
   _toggleCapsLock() {
@@ -667,22 +654,22 @@ window.addEventListener('DOMContentLoaded', () => {
   Keyboard.init();
 });
 
-// window.addEventListener('keydown', (e) => {
-//   // console.log(+e.keyCode)
-//   //   console.log(Keyboard);
-//
-//   for (const key of Keyboard.elements.keys) {
-//     // console.log(+key.dataset.keyCode)
-//     if (+e.keyCode === +key.dataset.keyCode) {
-//       key.classList.add('keyboard__key--pressed');
-//     }
-//   }
-// });
-//
-// window.addEventListener('keyup', (e) => {
-//   for (const key of Keyboard.elements.keys) {
-//     if (+e.keyCode === +key.dataset.keyCode) {
-//       key.classList.remove('keyboard__key--pressed');
-//     }
-//   }
-// });
+window.addEventListener('keydown', (e) => {
+  // console.log(+e.keyCode)
+  //   console.log(Keyboard);
+
+  for (const key of Keyboard.elements.keys) {
+    // console.log(+key.dataset.keyCode)
+    if (+e.keyCode === +key.dataset.keyCode) {
+      key.classList.add('keyboard__key--pressed');
+    }
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  for (const key of Keyboard.elements.keys) {
+    if (+e.keyCode === +key.dataset.keyCode) {
+      key.classList.remove('keyboard__key--pressed');
+    }
+  }
+});
