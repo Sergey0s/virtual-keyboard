@@ -640,7 +640,6 @@ const Keyboard = {
         fragment.append(document.createElement('br'));
       }
     });
-
     return fragment;
   },
 
