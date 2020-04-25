@@ -14,8 +14,8 @@ textarea {
 
 .keyboard {
     margin-top: 20px;
-    border: 1px solid black;
     width: 80%;
+    border: 1px solid black;
     max-width: 860px;
     background-color: #004134;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
@@ -27,6 +27,9 @@ textarea {
 }
 
 .keyboard__key {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
     height: 45px;
     width: 5%;
     max-width: 90px;
@@ -38,9 +41,6 @@ textarea {
     font-size: 1.05rem;
     outline: none;
     cursor: pointer;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .keyboard__key:hover {
