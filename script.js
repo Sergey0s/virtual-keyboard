@@ -1,9 +1,12 @@
 const title = document.createElement('h1');
-const text = document.createElement('p');
 title.innerText = 'Виртуальная клавиатура';
+
+const text = document.createElement('p');
 text.innerText = 'Переключения языка сочетанием клавиш Shift + Alt или нажатием на ⌨. Выполнено на OS Ubuntu.';
+
 const textarea = document.createElement('textarea');
 textarea.setAttribute('autofocus', 'true');
+
 document.body.append(title);
 document.body.append(text);
 document.body.append(textarea);
@@ -32,9 +35,13 @@ const Keyboard = {
 
     this.elements.main.classList.add('keyboard');
     this.elements.keysContainer.classList.add('keyboard__keys');
-    this.elements.keysContainer.append(this._createKeys(this.properties.language));
+    this.elements.keysContainer.append(
+      this._createKeys(this.properties.language),
+    );
 
-    this.elements.keys = this.elements.keysContainer.querySelectorAll('.keyboard__key');
+    this.elements.keys = this.elements.keysContainer.querySelectorAll(
+      '.keyboard__key',
+    );
 
     this.elements.main.append(this.elements.keysContainer);
     document.body.append(this.elements.main);
@@ -561,8 +568,10 @@ const Keyboard = {
         case 'backspace':
           keyElement.classList.add('keyboard__key--wide');
           keyElement.addEventListener('click', () => {
-            textarea.value = textarea.value.substring(0,
-              textarea.value.length - 1);
+            textarea.value = textarea.value.substring(
+              0,
+              textarea.value.length - 1,
+            );
           });
           break;
 
@@ -618,7 +627,8 @@ const Keyboard = {
           keyElement.textContent.toLowerCase();
           keyElement.addEventListener('click', () => {
             this.properties.value = this.properties.capsLock
-              ? element.key.toUpperCase() : element.key.toLowerCase();
+              ? element.key.toUpperCase()
+              : element.key.toLowerCase();
             this._triggerEvent('oninput');
           });
           break;
@@ -640,34 +650,60 @@ const Keyboard = {
 
   _changeLanguage() {
     this.properties.capsLock = false;
-    this.properties.language === 'ru' ? this.properties.language = 'en' : this.properties.language = 'ru';
+    this.properties.language === 'ru'
+      ? (this.properties.language = 'en')
+      : (this.properties.language = 'ru');
     this.elements.keysContainer.innerHTML = '';
-    this.elements.keysContainer.append(this._createKeys(this.properties.language));
-    this.elements.keys = this.elements.keysContainer.querySelectorAll('.keyboard__key');
+    this.elements.keysContainer.append(
+      this._createKeys(this.properties.language),
+    );
+    this.elements.keys = this.elements.keysContainer.querySelectorAll(
+      '.keyboard__key',
+    );
     localStorage.setItem('lang', this.properties.language);
   },
 
   _toggleCapsLock() {
     this.properties.capsLock = !this.properties.capsLock;
     for (const key of this.elements.keys) {
-      key.textContent = this.properties.capsLock
-        ? key.textContent.toUpperCase() : key.textContent.toLowerCase();
+      if (
+        key.dataset.keyCode !== '8'
+        && key.dataset.keyCode !== '9'
+        && key.dataset.keyCode !== '13'
+        && key.dataset.keyCode !== '16'
+        && key.dataset.keyCode !== '17'
+        && key.dataset.keyCode !== '18'
+        && key.dataset.keyCode !== '32'
+      ) {
+        key.textContent = this.properties.capsLock
+          ? key.textContent.toUpperCase()
+          : key.textContent.toLowerCase();
+      }
     }
   },
 };
 
-
-function checkLanguageChange() {
-  const pressedButtons = document.querySelectorAll('.keyboard__key--pressed');
-  if (pressedButtons.length > 1) {
-    if ((+pressedButtons[0].dataset.keyCode === 16 && +pressedButtons[1].dataset.keyCode === 18)
-      || (+pressedButtons[1].dataset.keyCode === 16 && +pressedButtons[0].dataset.keyCode === 18)) {
-      Keyboard._changeLanguage();
-    }
-  }
-  if (pressedButtons.length === 1) {
-    if (+pressedButtons[0].dataset.keyCode === 20) {
-      Keyboard._toggleCapsLock();
+function checkLanguageChange(key) {
+  if (+key === 20) {
+    Keyboard._toggleCapsLock();
+  } else {
+    const pressedButtons = document.querySelectorAll('.keyboard__key--pressed');
+    if (pressedButtons.length > 1) {
+      if (
+        (+pressedButtons[0].dataset.keyCode === 16
+                && +pressedButtons[1].dataset.keyCode === 18)
+            || (+pressedButtons[1].dataset.keyCode === 16
+            && +pressedButtons[0].dataset.keyCode === 18)
+      ) { Keyboard._changeLanguage(); } else if (pressedButtons.length > 2) {
+        if (
+          (+pressedButtons[1].dataset.keyCode === 16
+                    && +pressedButtons[2].dataset.keyCode === 18
+                    && +pressedButtons[0].dataset.keyCode === 20)
+                || (+pressedButtons[2].dataset.keyCode === 16
+                && +pressedButtons[1].dataset.keyCode === 18
+                && +pressedButtons[0].dataset.keyCode === 20)
+        ) { Keyboard._changeLanguage(); }
+      }
     }
   }
 }
@@ -678,18 +714,25 @@ window.addEventListener('DOMContentLoaded', () => {
 
 window.addEventListener('keydown', (e) => {
   for (const key of Keyboard.elements.keys) {
-    // console.log(+key.dataset.keyCode)
     if (+e.keyCode === +key.dataset.keyCode) {
-      key.classList.add('keyboard__key--pressed');
+      if (+key.dataset.keyCode === 20) {
+        key.classList.toggle('keyboard__key--pressed');
+      } else key.classList.add('keyboard__key--pressed');
+
+      if (+key.dataset.keyCode === 9) {
+        e.preventDefault();
+        e.stopPropagation();
+        textarea.value += '  ';
+      }
     }
   }
-  checkLanguageChange();
+  checkLanguageChange(e.keyCode);
 });
 
 window.addEventListener('keyup', (e) => {
   for (const key of Keyboard.elements.keys) {
     if (+e.keyCode === +key.dataset.keyCode) {
-      key.classList.remove('keyboard__key--pressed');
+      if (+key.dataset.keyCode !== 20) key.classList.remove('keyboard__key--pressed');
     }
   }
 });
